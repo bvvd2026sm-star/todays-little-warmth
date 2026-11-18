@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FFF3E9">
+<meta name="description" content="一间可爱的今日份想念补给站，领取一点好心情。">
+<title>今日份想念补给站</title>
+<style>
+/* ============ 基础与配色 ============ */
+:root{
+  --cream:#FFFBF5;
+  --pink:#FFE4EC;
+  --pink-deep:#FFAAC4;
+  --pink-strong:#FF8FB0;
+  --apricot:#FFE8CC;
+  --brown:#8B6B54;
+  --brown-dark:#5C4638;
+  --brown-soft:#A6836A;
+  --line:#F0D2BC;
+  --shadow:rgba(139,107,84,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  min-height:100vh;
+  background:linear-gradient(165deg,#FFFBF5 0%,#FFEFF3 42%,#FFF1E3 100%);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑","Segoe UI",Roboto,sans-serif;
+  color:var(--brown-dark);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============ 背景漂浮装饰 ============ */
+#decorLayer{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.decor{position:absolute;opacity:.42;animation:bob ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-24px) rotate(14deg);}}
+.s-star{width:16px;height:16px;background:#FFD166;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);}
+.s-heart{width:14px;height:14px;background:var(--pink-deep);position:relative;transform:rotate(-45deg);}
+.s-heart::before,.s-heart::after{content:"";position:absolute;width:14px;height:14px;background:inherit;border-radius:50%;}
+.s-heart::before{top:-7px;left:0;}
+.s-heart::after{left:7px;top:0;}
+.s-cloud{width:56px;height:18px;background:rgba(255,255,255,.8);border-radius:18px;position:relative;}
+.s-cloud::before,.s-cloud::after{content:"";position:absolute;background:inherit;border-radius:50%;}
+.s-cloud::before{width:28px;height:28px;top:-14px;left:11px;}
+.s-cloud::after{width:22px;height:22px;top:-10px;right:13px;}
+
+/* 隐藏款爱心粒子层 */
+#heartLayer{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:15;}
+.hp{position:absolute;bottom:-30px;animation:hpUp 3.2s ease-out forwards;}
+@keyframes hpUp{
+  0%{transform:translateY(0) scale(.7);opacity:0;}
+  15%{opacity:1;}
+  100%{transform:translateY(-90vh) scale(1.2);opacity:0;}
+}
+
+/* ============ 主容器 ============ */
+.wrap{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:16px 16px 44px;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+/* 音效开关 */
+.sound-btn{position:fixed;top:14px;right:14px;z-index:20;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:rgba(255,255,255,.9);font-size:19px;cursor:pointer;box-shadow:0 4px 12px var(--shadow);transition:transform .15s;}
+.sound-btn:active{transform:scale(.9);}
+
+/* 计数 */
+.counter{font-size:12px;color:var(--brown-soft);background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:999px;padding:5px 14px;margin:2px 0 10px;box-shadow:0 3px 8px rgba(139,107,84,.08);}
+
+/* 欢迎文案 */
+.intro{text-align:center;margin:2px 0 10px;}
+.intro p{margin:4px 0;font-size:14px;line-height:1.6;color:#6E5747;}
+.intro .welcome{font-size:17px;font-weight:800;color:var(--pink-strong);letter-spacing:.5px;}
+
+/* ============ 场景：贩卖机 + 小猫 ============ */
+.scene{display:flex;align-items:flex-end;justify-content:center;gap:4px;width:100%;margin:4px 0 6px;}
+
+/* 贩卖机 */
+.vending{position:relative;width:206px;flex:0 0 auto;}
+.vending.shake{animation:shake .5s ease-in-out;}
+@keyframes shake{
+  0%,100%{transform:translateX(0) rotate(0);}
+  20%{transform:translateX(-4px) rotate(-1.2deg);}
+  40%{transform:translateX(4px) rotate(1.2deg);}
+  60%{transform:translateX(-3px) rotate(-.8deg);}
+  80%{transform:translateX(3px) rotate(.8deg);}
+}
+.vending-sign{
+  background:linear-gradient(135deg,#FFB3C6,#FF96B4);
+  color:#fff;text-align:center;padding:9px 6px;border-radius:14px 14px 5px 5px;
+  font-weight:800;font-size:14px;letter-spacing:1px;
+  box-shadow:0 5px 0 #EC7C9F,0 9px 16px var(--shadow);
+  text-shadow:0 1px 2px rgba(0,0,0,.12);
+}
+.vending-body{
+  background:linear-gradient(160deg,#FFF6EA,#FFE6D6);
+  border:3px solid var(--line);border-top:none;border-radius:0 0 16px 16px;
+  padding:10px;box-shadow:inset 0 2px 6px rgba(255,255,255,.9),0 12px 22px var(--shadow);
+  transition:box-shadow .4s;
+}
+.vending.pink-mode .vending-body{
+  box-shadow:inset 0 2px 6px rgba(255,255,255,.9),0 0 30px rgba(255,143,176,.75),0 12px 22px var(--shadow);
+}
+.vending-window{
+  background:linear-gradient(180deg,#FFF9F2,#FDE9DE);
+  border-radius:10px;border:2px solid var(--line);height:116px;padding:8px;
+  display:flex;flex-direction:column;justify-content:space-around;
+  box-shadow:inset 0 3px 8px rgba(139,107,84,.12);
+}
+.shelf{display:flex;justify-content:space-around;align-items:center;border-bottom:2px dashed var(--line);padding-bottom:6px;}
+.shelf:last-child{border-bottom:none;padding-bottom:0;}
+.snack{font-size:22px;filter:drop-shadow(0 2px 1px rgba(0,0,0,.08));}
+.vending-lights{display:flex;justify-content:center;gap:8px;margin:9px 0;}
+.vending-lights i{width:8px;height:8px;border-radius:50%;background:#E9C9AE;box-shadow:inset 0 1px 2px rgba(0,0,0,.15);}
+.vending-lights.flashing i:nth-child(1){background:#FFD166;animation:blink .3s infinite alternate;}
+.vending-lights.flashing i:nth-child(2){background:#FF9EBB;animation:blink .3s .1s infinite alternate;}
+.vending-lights.flashing i:nth-child(3){background:#8FD9C0;animation:blink .3s .2s infinite alternate;}
+.vending-lights.flashing i:nth-child(4){background:#9EC5FF;animation:blink .3s .3s infinite alternate;}
+@keyframes blink{from{opacity:.35;box-shadow:none;}to{opacity:1;box-shadow:0 0 10px currentColor;}}
+.vending-panel{display:flex;justify-content:space-between;align-items:center;padding:2px 6px;}
+.coin-slot{position:relative;width:52px;height:32px;background:#F3D7C0;border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 4px rgba(139,107,84,.2);}
+.slot{width:6px;height:18px;background:#7A5C48;border-radius:3px;box-shadow:inset 0 0 2px #000;}
+.coin{position:absolute;left:50%;top:3px;font-size:19px;opacity:0;transform:translate(-50%,-92px) rotateY(0);}
+.coin.drop{animation:coinDrop .85s ease-in forwards;}
+@keyframes coinDrop{
+  0%{opacity:1;transform:translate(-50%,-92px) rotateY(0deg);}
+  85%{opacity:1;}
+  100%{opacity:0;transform:translate(-50%,0) rotateY(720deg);}
+}
+.vending-btn{width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,#FFB3C6,#FF8FAE);box-shadow:0 4px 0 #E87A9A,0 6px 8px rgba(0,0,0,.12);}
+.vending-btn.press{animation:btnPress .2s ease;}
+@keyframes btnPress{50%{transform:translateY(3px);box-shadow:0 1px 0 #E87A9A;}}
+.vending-tray{margin-top:8px;height:32px;background:#E9C9AE;border-radius:8px;position:relative;box-shadow:inset 0 3px 6px rgba(139,107,84,.25);}
+.tray-flap{position:absolute;left:12%;right:12%;top:6px;height:14px;background:#D9B595;border-radius:6px;box-shadow:0 2px 0 #C9A282;}
+.vending-legs{display:flex;justify-content:space-between;padding:0 26px;}
+.vending-legs span{width:16px;height:11px;background:#C9A288;border-radius:0 0 5px 5px;}
+
+/* 小猫店员 */
+.cat{position:relative;width:96px;height:128px;flex:0 0 auto;}
+.cat-bubble{
+  position:absolute;bottom:calc(100% - 10px);right:-18px;width:118px;
+  background:#fff;border:2px solid var(--pink-deep);border-radius:14px;
+  padding:8px 10px;font-size:11px;line-height:1.5;color:var(--brown-dark);
+  box-shadow:0 6px 14px var(--shadow);z-index:6;
+}
+.cat-bubble::after{content:"";position:absolute;bottom:-9px;right:20px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:9px solid var(--pink-deep);}
+.cat-head{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:74px;height:62px;background:#FFF3E6;border:3px solid #E9C9AE;border-radius:50%;z-index:2;}
+.ear{position:absolute;top:-13px;width:24px;height:24px;background:#E9C9AE;clip-path:polygon(50% 0,100% 100%,0 100%);}
+.ear.l{left:3px;transform:rotate(-15deg);}
+.ear.r{right:3px;transform:rotate(15deg);}
+.ear-inner{position:absolute;left:4px;top:6px;width:16px;height:16px;background:#FFD1DC;clip-path:polygon(50% 0,100% 100%,0 100%);}
+.eye{position:absolute;top:25px;width:9px;height:12px;background:#5C4638;border-radius:50%;animation:catBlink 4.6s infinite;}
+.eye.l{left:20px;}
+.eye.r{right:20px;}
+.eye::after{content:"";position:absolute;top:2px;left:2px;width:3px;height:3px;background:#fff;border-radius:50%;}
+@keyframes catBlink{0%,93%,100%{transform:scaleY(1);}96%{transform:scaleY(.08);}}
+.cheek{position:absolute;top:39px;width:12px;height:7px;background:#FFC0CB;border-radius:50%;opacity:.75;}
+.cheek.l{left:9px;}
+.cheek.r{right:9px;}
+.nose{position:absolute;top:39px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #E88FA6;}
+.cat-body{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:62px;height:58px;background:#FFF3E6;border:3px solid #E9C9AE;border-radius:42% 42% 34% 34%;z-index:1;}
+.cat-tail{position:absolute;bottom:8px;right:-4px;width:26px;height:11px;background:#E9C9AE;border-radius:10px;transform:rotate(-28deg);z-index:0;}
+.cat-paw{position:absolute;bottom:-3px;width:20px;height:12px;background:#FFF3E6;border:3px solid #E9C9AE;border-top:none;border-radius:0 0 10px 10px;}
+.cat-paw.l{left:8px;}
+.cat-paw.r{right:8px;}
+.cat.waving .cat-paw.r{animation:wave 1.5s ease-in-out infinite;transform-origin:top center;}
+@keyframes wave{0%,100%{transform:rotate(0);}25%{transform:rotate(-35deg);}75%{transform:rotate(25deg);}}
+
+/* ============ 控制按钮 ============ */
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%;margin-top:12px;min-height:52px;}
+.coin-controls,.result-controls{display:flex;gap:10px;justify-content:center;}
+.btn{
+  border:none;cursor:pointer;font-family:inherit;font-weight:800;color:#fff;
+  background:linear-gradient(145deg,#FF9EBB,#FF7FA5);
+  padding:13px 22px;border-radius:999px;font-size:15px;
+  box-shadow:0 5px 0 #E56B92,0 10px 18px rgba(229,107,146,.28);
+  transition:transform .08s,box-shadow .08s;touch-action:manipulation;
+}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #E56B92,0 3px 8px rgba(229,107,146,.28);}
+.btn.secondary{background:linear-gradient(145deg,#F7D9B8,#F0C79C);color:var(--brown-dark);box-shadow:0 5px 0 #DDB082,0 10px 18px rgba(139,107,84,.18);}
+.btn.secondary:active{box-shadow:0 1px 0 #DDB082,0 3px 8px rgba(139,107,84,.18);}
+
+/* ============ 补给卡 ============ */
+.card-stage{width:100%;display:flex;justify-content:center;margin-top:14px;}
+.card{
+  width:100%;max-width:330px;background:linear-gradient(160deg,#FFFDF9,#FFF4EC);
+  border:2px solid var(--line);border-radius:20px;padding:20px 18px 18px;text-align:center;
+  box-shadow:0 12px 26px var(--shadow);position:relative;overflow:hidden;
+}
+.card::before{content:"";position:absolute;top:-34px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,#FFE4EC,transparent 70%);pointer-events:none;}
+.card-icon{font-size:44px;line-height:1;margin-bottom:6px;}
+.card-title{font-size:19px;font-weight:800;color:var(--brown-dark);margin-bottom:10px;}
+.card-line{width:44px;height:3px;background:var(--pink-deep);border-radius:3px;margin:0 auto 12px;}
+.card-text p{margin:6px 0;font-size:14px;line-height:1.7;color:#6E5747;}
+.card-footer{margin-top:14px;font-size:12px;color:#A6836A;border-top:1px dashed #EAD3C0;padding-top:10px;}
+.card.reveal{animation:cardPop .5s cubic-bezier(.2,1.3,.4,1) both;}
+@keyframes cardPop{0%{opacity:0;transform:translateY(22px) scale(.8);}60%{opacity:1;transform:translateY(-6px) scale(1.03);}100%{opacity:1;transform:translateY(0) scale(1);}}
+.card.card-hidden{background:linear-gradient(160deg,#FFF5F8,#FFE7EF);border-color:#FFC2D4;box-shadow:0 0 30px rgba(255,143,176,.35),0 12px 26px var(--shadow);}
+.card.card-hidden::before{background:radial-gradient(circle,#FFC9DA,transparent 70%);}
+.card.reveal-hidden{animation:hiddenReveal .9s cubic-bezier(.2,.9,.3,1) both;transform-origin:center center;}
+@keyframes hiddenReveal{0%{opacity:0;transform:perspective(700px) rotateX(-88deg) scale(.7);}100%{opacity:1;transform:perspective(700px) rotateX(0) scale(1);}}
+
+/* ============ 结束页 ============ */
+.end-screen{text-align:center;margin-top:18px;animation:fadeUp .6s ease both;}
+.end-screen h2{font-size:24px;color:var(--pink-strong);margin:0 0 10px;}
+.end-screen p{margin:6px 0;font-size:15px;line-height:1.7;color:#6E5747;}
+.end-screen .shop-line{margin-top:26px;font-size:12px;color:var(--brown-soft);letter-spacing:.5px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ 状态显隐 ============ */
+.state-idle .result-controls,.state-idle .card-stage,.state-idle .end-screen{display:none;}
+.state-drawing .coin-controls,.state-drawing .result-controls,.state-drawing .card-stage,.state-drawing .end-screen{display:none;}
+.state-result .coin-controls,.state-result .end-screen{display:none;}
+.state-end .coin-controls,.state-end .result-controls,.state-end .card-stage,.state-end .intro{display:none;}
+
+@media (max-width:360px){
+  .vending{width:188px;}
+  .cat{width:84px;}
+  .cat-bubble{width:112px;right:-14px;font-size:10px;}
+  .snack{font-size:20px;}
+}
+
+/* ============ 视觉升级：更柔和、更有层次 ============ */
+body{
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255,210,220,.62), transparent 26%),
+    radial-gradient(circle at 88% 22%, rgba(255,224,185,.58), transparent 25%),
+    radial-gradient(circle at 50% 88%, rgba(255,218,228,.48), transparent 30%),
+    linear-gradient(160deg,#fffaf5 0%,#fff0f3 48%,#fff4e8 100%);
+}
+.wrap{max-width:500px;padding:22px 18px 48px;}
+.counter{
+  padding:7px 16px;margin:4px 0 14px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(240,210,188,.85);
+  box-shadow:0 7px 20px rgba(139,107,84,.08);
+  letter-spacing:.3px;
+}
+.intro{margin:4px 0 15px;}
+.intro p{font-size:14px;line-height:1.75;}
+.intro .welcome{font-size:19px;color:#e987a4;}
+.secret-hint{
+  display:inline-block;
+  margin:8px auto 0;
+  padding:6px 12px;
+  border:1px dashed #efb8c6;
+  border-radius:999px;
+  background:rgba(255,255,255,.68);
+  color:#a87978;
+  font-size:12px;
+  line-height:1.5;
+  box-shadow:0 3px 10px rgba(139,107,84,.06);
+}
+.intro p:nth-child(2){font-size:23px;font-weight:900;letter-spacing:1px;color:#765344;margin:7px 0;}
+.scene{gap:0;margin:10px 0 12px;align-items:flex-end;}
+.vending{width:220px;filter:drop-shadow(0 14px 18px rgba(176,124,115,.12));}
+.vending-sign{
+  padding:12px 7px;font-size:15px;
+  background:linear-gradient(135deg,#ffb8cb 0%,#f58eae 100%);
+  box-shadow:0 5px 0 #e77e9e,0 10px 20px rgba(229,107,146,.18);
+}
+.vending-body{
+  padding:12px;
+  background:linear-gradient(150deg,#fffaf0 0%,#ffe5dc 100%);
+  border-color:#f2cdbb;
+  box-shadow:inset 0 2px 8px rgba(255,255,255,.95),0 15px 26px rgba(139,107,84,.13);
+}
+.vending-window{
+  height:126px;
+  background:linear-gradient(180deg,#fffdf8,#ffede7);
+  border-color:#f1d4c5;
+}
+.snack{font-size:25px;}
+.cat{transform:scale(1.06);transform-origin:bottom left;}
+.cat-bubble{
+  background:rgba(255,255,255,.97);
+  border-color:#ffb4c8;
+  box-shadow:0 9px 22px rgba(139,107,84,.12);
+  font-size:12px;
+}
+.controls{margin-top:15px;min-height:54px;}
+.btn{
+  padding:14px 22px;
+  background:linear-gradient(135deg,#f69db8,#ed7fa2);
+  box-shadow:0 5px 0 #d96e91,0 10px 22px rgba(229,107,146,.2);
+}
+.btn.secondary{
+  background:linear-gradient(135deg,#f8dfc3,#efc99f);
+  box-shadow:0 5px 0 #d7ae83,0 10px 18px rgba(139,107,84,.13);
+}
+.card-stage{margin-top:18px;}
+.card{
+  max-width:360px;
+  padding:24px 21px 20px;
+  border:1.5px solid #f1d2c4;
+  border-radius:25px;
+  background:linear-gradient(155deg,rgba(255,255,255,.98),rgba(255,245,237,.98));
+  box-shadow:0 18px 38px rgba(139,107,84,.13);
+}
+.card-icon{font-size:50px;margin-bottom:10px;}
+.card-title{font-size:21px;color:#765344;}
+.card-text p{font-size:15px;line-height:1.85;}
+.card.card-hidden{
+  border:2px solid #ffb6ca;
+  background:linear-gradient(145deg,#fffafd 0%,#ffe8f0 100%);
+  box-shadow:0 0 0 7px rgba(255,190,209,.13),0 18px 40px rgba(220,125,157,.2);
+}
+.card.card-hidden .card-title{color:#d66f91;}
+.card-footer{font-size:13px;color:#b27d83;}
+.end-screen{
+  width:100%;max-width:360px;padding:24px 18px;
+  background:rgba(255,255,255,.78);
+  border:1px solid #f0d8ca;border-radius:24px;
+  box-shadow:0 12px 28px rgba(139,107,84,.09);
+}
+.end-screen h2{font-size:25px;}
+@media (max-width:390px){
+  .wrap{padding:16px 12px 36px;}
+  .vending{width:198px;}
+  .cat{transform:scale(.96);}
+  .intro p:nth-child(2){font-size:21px;}
+  .btn{font-size:14px;padding:13px 17px;}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- 背景装饰 -->
+<div id="decorLayer" aria-hidden="true"></div>
+<!-- 隐藏款爱心粒子 -->
+<div id="heartLayer" aria-hidden="true"></div>
+
+<!-- 音效开关（默认关闭） -->
+<button class="sound-btn" id="soundBtn" title="音效开关" aria-label="音效开关">🔇</button>
+
+<main class="wrap state-idle" id="wrap">
+
+  <div class="counter" id="counter">🧾 已领取 0 份补给</div>
+
+  <!-- 欢迎文案 -->
+  <section class="intro">
+    <p class="welcome">欢迎光临！</p>
+    <p>今日份想念补给站</p>
+    <p>本店出售一些奇奇怪怪的小情绪。</p>
+    <p>不收钱，只收一点点好心情。</p>
+    <p class="secret-hint">店长悄悄说：多来看看，也许会有特别惊喜 ✨</p>
+  </section>
+
+  <!-- 场景 -->
+  <section class="scene">
+    <div class="vending" id="vending">
+      <div class="vending-sign">今日份想念补给站</div>
+      <div class="vending-body" id="vendingBody">
+        <div class="vending-window">
+          <div class="shelf"><span class="snack">🧸</span><span class="snack">🍪</span><span class="snack">🧁</span></div>
+          <div class="shelf"><span class="snack">🍬</span><span class="snack">💌</span><span class="snack">🌷</span></div>
+        </div>
+        <div class="vending-lights" id="lights"><i></i><i></i><i></i><i></i></div>
+        <div class="vending-panel">
+          <div class="coin-slot"><div class="slot"></div><div class="coin" id="coin">🪙</div></div>
+          <div class="vending-btn" id="vendingBtn" aria-hidden="true"></div>
+        </div>
+        <div class="vending-tray"><div class="tray-flap"></div></div>
+      </div>
+      <div class="vending-legs"><span></span><span></span></div>
+    </div>
+
+    <div class="cat" id="cat">
+      <div class="cat-bubble" id="catBubble">嘘……今天好像藏着一份特别补给哦！</div>
+      <div class="cat-head">
+        <div class="ear l"><div class="ear-inner"></div></div>
+        <div class="ear r"><div class="ear-inner"></div></div>
+        <div class="eye l"></div><div class="eye r"></div>
+        <div class="cheek l"></div><div class="cheek r"></div>
+        <div class="nose"></div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-paw l"></div><div class="cat-paw r"></div>
+      </div>
+      <div class="cat-tail"></div>
+    </div>
+  </section>
+
+  <!-- 控制区 -->
+  <section class="controls">
+    <div class="coin-controls">
+      <button class="btn" id="coinBtn">投喂一枚虚拟硬币 🪙</button>
+    </div>
+    <div class="result-controls">
+      <button class="btn" id="againBtn">再逛逛 / 再抽一次</button>
+      <button class="btn secondary" id="endBtn">今天就到这里</button>
+    </div>
+  </section>
+
+  <!-- 卡片区 -->
+  <section class="card-stage" id="cardStage"></section>
+
+  <!-- 结束页 -->
+  <section class="end-screen" id="endScreen">
+    <h2>今日补给已送达！</h2>
+    <p>记得按时开心，下次再来玩呀。</p>
+    <p class="shop-line">本店长期营业，欢迎再次光临。</p>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ 数据 ============ */
+  var NORMAL_CARDS = [
+    { icon:"☀️", title:"今日好运", lines:["好事正在加载中……","请保持耐心，好运可能正在路上。"] },
+    { icon:"🍬", title:"今日甜度", lines:["今日甜度已经超标！","希望你的生活也能一直甜甜的。"] },
+    { icon:"🐱", title:"今日可爱", lines:["恭喜你获得今日可爱认证！","有效期：永久。"] },
+    { icon:"🌷", title:"今日温柔", lines:["希望今天也有人好好对你。","如果没有，也要记得好好照顾自己。"] }
+  ];
+  var HIDDEN_CARD = {
+    icon:"💗", title:"神秘想念补给",
+    lines:["叮！恭喜发现今日限定隐藏补给。","有人偷偷想你了。","这份想念没有署名，只希望你今天开心。"],
+    footer:"具体是谁？本店概不透露。🐱"
+  };
+  var HIDDEN_RATE_FIRST = 0.30; // 第一次抽取概率 30%
+  var HIDDEN_RATE_SECOND = 0.45; // 第二次抽取概率 45%
+  // 第三次抽取必定出现隐藏款，避免访客一直抽不到
+
+  /* ============ 状态 ============ */
+  var drawCount = 0;      // 抽奖次数统计
+  var hiddenFound = false;// 本次访问是否已抽到隐藏款
+  var isBusy = false;     // 防止动画期间重复点击
+  var soundOn = false;    // 音效默认关闭
+  var audioCtx = null;
+
+  /* ============ DOM ============ */
+  function $(id){ return document.getElementById(id); }
+  var wrap = $("wrap"), counter = $("counter"), catBubble = $("catBubble");
+  var vending = $("vending"), coin = $("coin"), lights = $("lights"), vendingBtn = $("vendingBtn");
+  var cardStage = $("cardStage"), heartLayer = $("heartLayer"), cat = $("cat");
+
+  /* ============ 背景装饰生成 ============ */
+  function buildDecor(){
+    var layer = $("decorLayer");
+    var types = ["s-star","s-heart","s-cloud"];
+    for(var i=0;i<16;i++){
+      var box = document.createElement("div");
+      box.className = "decor";
+      box.style.left = (Math.random()*92) + "%";
+      box.style.top = (Math.random()*92) + "%";
+      var dur = 8 + Math.random()*8;
+      box.style.animationDuration = dur + "s";
+      box.style.animationDelay = (-Math.random()*dur) + "s";
+      var shape = document.createElement("div");
+      var t = types[i % 3];
+      shape.className = t;
+      shape.style.transform = (t === "s-cloud") ? "scale(" + (0.7+Math.random()*0.5) + ")" : "scale(" + (0.8+Math.random()*0.6) + ")";
+      box.appendChild(shape);
+      layer.appendChild(box);
+    }
+  }
+
+  /* ============ 音效（Web Audio 生成，无外部资源） ============ */
+  function tone(freq, dur, type, vol, delay){
+    if(!soundOn) return;
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var t0 = audioCtx.currentTime + (delay || 0);
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, t0);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(vol || 0.12, t0 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(t0); osc.stop(t0 + dur + 0.02);
+    }catch(e){ /* 音频不可用时静默 */ }
+  }
+  function playSound(kind){
+    if(!soundOn) return;
+    if(kind === "coin"){ tone(880,.09,"square",.08,0); tone(1320,.12,"square",.07,.09); }
+    else if(kind === "reveal"){ tone(660,.16,"sine",.12,0); tone(880,.22,"sine",.1,.1); }
+    else if(kind === "hidden"){ [523,659,784,1046].forEach(function(f,i){ tone(f,.3,"sine",.1,i*.11); }); }
+    else if(kind === "click"){ tone(520,.06,"sine",.07,0); }
+    else if(kind === "end"){ tone(660,.18,"sine",.1,0); tone(523,.28,"sine",.1,.16); }
+  }
+
+  /* ============ 通用 UI ============ */
+  function setState(s){ wrap.className = "wrap state-" + s; }
+  function updateCounter(){ counter.textContent = "🧾 已领取 " + drawCount + " 份补给"; }
+  function setBubble(text){ catBubble.textContent = text; }
+  function restart(el, cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+  /* ============ 隐藏款爱心粒子 ============ */
+  function spawnHearts(){
+    heartLayer.innerHTML = "";
+    var symbols = ["💗","💕","💖","✨"];
+    for(var i=0;i<18;i++){
+      var h = document.createElement("span");
+      h.className = "hp";
+      h.textContent = symbols[i % symbols.length];
+      h.style.left = (6 + Math.random()*86) + "%";
+      h.style.fontSize = (14 + Math.random()*16) + "px";
+      h.style.animationDelay = (Math.random()*0.7) + "s";
+      heartLayer.appendChild(h);
+    }
+    setTimeout(function(){ heartLayer.innerHTML = ""; }, 4200);
+  }
+
+  /* ============ 卡片渲染 ============ */
+  function renderCard(card, hidden){
+    var lines = card.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
+    var footer = card.footer ? '<div class="card-footer">' + card.footer + "</div>" : "";
+    cardStage.innerHTML =
+      '<div class="card ' + (hidden ? "card-hidden reveal-hidden" : "reveal") + '" id="card">' +
+        '<div class="card-icon">' + card.icon + "</div>" +
+        '<div class="card-title">' + card.title + "</div>" +
+        '<div class="card-line"></div>' +
+        '<div class="card-text">' + lines + "</div>" +
+        footer +
+      "</div>";
+  }
+
+  /* ============ 概率判断 ============ */
+  function shouldShowHidden(){
+    if(hiddenFound) return false;              // 本次访问隐藏款只出现一次
+
+    // 第一次 30%，第二次 45%；如果前两次都没抽中，第三次保底出现。
+    if(drawCount === 1) return Math.random() < HIDDEN_RATE_FIRST;
+    if(drawCount === 2) return Math.random() < HIDDEN_RATE_SECOND;
+    if(drawCount >= 3) return true;
+
+    return false;
+  }
+
+  /* ============ 投币 → 抽卡 ============ */
+  function insertCoin(){
+    if(isBusy) return;
+    isBusy = true;
+    playSound("click");
+    cardStage.innerHTML = "";                  // 清空上一张卡
+    setState("drawing");
+    setBubble("叮咚～正在为你准备补给…");
+
+    restart(coin, "drop");
+    restart(vending, "shake");
+    restart(vendingBtn, "press");
+    lights.classList.add("flashing");
+    playSound("coin");
+
+    setTimeout(function(){
+      lights.classList.remove("flashing");
+      doDraw();
+    }, 1050);
+  }
+
+  function doDraw(){
+    drawCount++;
+    updateCounter();
+    var hidden = shouldShowHidden();
+    if(hidden) hiddenFound = true;
+    var card = hidden ? HIDDEN_CARD : NORMAL_CARDS[Math.floor(Math.random()*NORMAL_CARDS.length)];
+
+    renderCard(card, hidden);
+    setState("result");
+    isBusy = false;
+
+    if(hidden){
+      vending.classList.add("pink-mode");
+      spawnHearts();
+      setBubble("咦？！这是……限定款！");
+      playSound("hidden");
+      setTimeout(function(){ vending.classList.remove("pink-mode"); }, 4300);
+    }else{
+      setBubble(drawCount === 1 ? "请收好你的今日补给～" : "又来一份！请收好～");
+      playSound("reveal");
+    }
+  }
+
+  /* ============ 结束 ============ */
+  function endVisit(){
+    if(isBusy) return;
+    playSound("click");
+    cat.classList.add("waving");
+    setBubble("记得按时开心，下次再来玩呀～");
+    setState("end");
+    playSound("end");
+  }
+
+  /* ============ 事件绑定 ============ */
+  $("coinBtn").addEventListener("click", insertCoin);
+  $("againBtn").addEventListener("click", insertCoin);
+  $("endBtn").addEventListener("click", endVisit);
+  $("soundBtn").addEventListener("click", function(){
+    soundOn = !soundOn;
+    this.textContent = soundOn ? "🔊" : "🔇";
+    if(soundOn) playSound("click");
+  });
+
+  /* ============ 初始化 ============ */
+  buildDecor();
+  updateCounter();
+})();
+</script>
+</body>
+</html>
